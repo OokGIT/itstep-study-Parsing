@@ -18,11 +18,13 @@ def get_content(html):
 #    print(items)
     tours = []
     for item in items:
+        price_field = item.find('div', class_='field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item').get_text().replace('від ','')
         tours.append({
-            'title': item.find('div', class_='field field--name-node-title field--type-ds field--label-hidden field--item').get_text(strip=True),
-            'link': HOST + item.find('a', href=True).attrs['href'],
-            'price': item.find('div', class_='field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item').get_text(),
-            'country': item.find('span', class_='field-content').get_text()
+            # 'title': item.find('div', class_='field field--name-node-title field--type-ds field--label-hidden field--item').get_text(strip=True),
+            # 'link': HOST + item.find('a', href=True).attrs['href'],
+            # 'price': item.find('div', class_='field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item').get_text(),
+            'price': price_field,
+            # 'country': item.find('span', class_='field-content').get_text()
         })
     print(tours)
 
