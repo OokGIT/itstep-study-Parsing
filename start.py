@@ -1,14 +1,25 @@
 import requests
 import bs4
+import csv
+
 URL = 'https://feerie.com.ua/ua/all-tours/'
 HEADERS = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0',
            'accept': '*/*'}
 HOST = 'https://feerie.com.ua'
+EXPORT_CSV = 'feerie_parse.csv'
 
 
 def get_html(url, params=None):
     r = requests.get(url, headers=HEADERS, params=params)
     return r
+
+
+def save_csv(items, path):
+    with open(path, 'w', newline='') as file:
+        writer = csv.writer(file, delimiter=';')
+        writer.writerow(['Название тура', 'ссылка', 'Цена', 'Страна'])
+        for item in items:
+            writer.writerow([item['title'], item['link'], item['price'], item['country']])
 
 
 def get_content(html):
@@ -38,9 +49,10 @@ def parse():
             print('Парсинг страницы', page + 1)
             html = get_html(URL, params={'page': page})
             tours.extend(get_content(html.text))
+            save_csv(tours, EXPORT_CSV)
         # get_content(html.text)
-        print('Done!')
-        print(tours)
+        print('Готово, результаты записаны в файл', EXPORT_CSV)
+        # print(tours)
     else:
         print('Error on page, not 200 response')
 
