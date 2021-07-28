@@ -1,9 +1,8 @@
 import requests
 import bs4
 URL = 'https://feerie.com.ua/ua/all-tours/'
-# HEADERS = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0',
-#            'accept': '*/*'}
-HEADERS = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0'}
+HEADERS = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0',
+           'accept': '*/*'}
 HOST = 'https://feerie.com.ua'
 
 
@@ -20,21 +19,29 @@ def get_content(html):
     for item in items:
         price_field = item.find('div', class_='field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item').get_text().replace('від ','')
         tours.append({
-            # 'title': item.find('div', class_='field field--name-node-title field--type-ds field--label-hidden field--item').get_text(strip=True),
-            # 'link': HOST + item.find('a', href=True).attrs['href'],
+            'title': item.find('div', class_='field field--name-node-title field--type-ds field--label-hidden field--item').get_text(strip=True),
+            'link': HOST + item.find('a', href=True).attrs['href'],
             # 'price': item.find('div', class_='field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item').get_text(),
             'price': price_field,
-            # 'country': item.find('span', class_='field-content').get_text()
+            'country': item.find('span', class_='field-content').get_text()
         })
-    print(tours)
+    return(tours)
 
 
 def parse():
+    pages_count = input('Сколько страниц парсить?')
+    pages_count = int(pages_count.strip())
     html = get_html(URL)
     if html.status_code == 200:
-        get_content(html.text)
+        tours = []
+        for page in range(0, pages_count):
+            print('Парсинг страницы', page + 1)
+            html = get_html(URL, params={'page': page})
+            tours.extend(get_content(html.text))
+        # get_content(html.text)
+        print('Done!')
+        print(tours)
     else:
         print('Error on page, not 200 response')
-
 
 parse()
