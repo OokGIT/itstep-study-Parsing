@@ -21,7 +21,7 @@ def get_html(url, params=None):
 
 
 def save_csv(items, path):
-    with open(path, 'w', newline='') as file:
+    with open(path, 'w', newline='', encoding='utf8') as file:
         writer = csv.writer(file, delimiter=';')
         writer.writerow(['Название тура', 'ссылка', 'Цена', 'Страна'])
         for item in items:
