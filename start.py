@@ -1,12 +1,18 @@
 import requests
 import bs4
 import csv
+import re
 
 URL = 'https://feerie.com.ua/ua/all-tours/'
 HEADERS = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko/20100101 Firefox/90.0',
            'accept': '*/*'}
 HOST = 'https://feerie.com.ua'
 EXPORT_CSV = 'feerie_parse.csv'
+
+# Находим номер последней странички в пагинации
+response = requests.get(URL)
+soup = bs4.BeautifulSoup(response.text, 'html.parser')
+pages_count = int(re.findall('(?<=page\=)\d+', str(soup.find("li", class_="pager__item pager__item--last")))[0])
 
 
 def get_html(url, params=None):
@@ -28,7 +34,7 @@ def get_content(html):
 #    print(items)
     tours = []
     for item in items:
-        price_field = item.find('div', class_='field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item').get_text().replace('від ','')
+        price_field = item.find('div', class_='field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item').get_text().replace('від ', '')
         tours.append({
             'title': item.find('div', class_='field field--name-node-title field--type-ds field--label-hidden field--item').get_text(strip=True),
             'link': HOST + item.find('a', href=True).attrs['href'],
@@ -40,8 +46,8 @@ def get_content(html):
 
 
 def parse():
-    pages_count = input('Сколько страниц парсить?')
-    pages_count = int(pages_count.strip())
+    # pages_count = input('Сколько страниц парсить?')
+    # pages_count = int(pages_count.strip())
     html = get_html(URL)
     if html.status_code == 200:
         tours = []
