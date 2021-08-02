@@ -9,11 +9,15 @@ HEADERS = {'user-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:90.0) Gecko
 HOST = 'https://feerie.com.ua'
 EXPORT_CSV = 'feerie_parse.csv'
 
-# Находим номер последней странички в пагинации
-response = requests.get(URL)
-soup = bs4.BeautifulSoup(response.text, 'html.parser')
-pages_count = int(re.findall('(?<=page\=)\d+', str(soup.find("li", class_="pager__item pager__item--last")))[0])
+CLASS_PAGER_ITEM = 'pager__item pager__item--last'
+CLASS_PRICE_BLOCK = 'field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item'
+CLASS_ITEM = 'field field--name-node-title field--type-ds field--label-hidden field--item'
 
+# Находим номер последней странички в пагинации
+# response = requests.get(URL)
+# soup = bs4.BeautifulSoup(response.text, 'html.parser')
+# pages_count = int(re.findall('(?<=page\=)\d+', str(soup.find("li", class_=CLASS_PAGER_ITEM)))[0])
+pages_count = 1
 
 def get_html(url, params=None):
     r = requests.get(url, headers=HEADERS, params=params)
@@ -34,12 +38,12 @@ def get_content(html):
 #    print(items)
     tours = []
     for item in items:
-        price_field = item.find('div', class_='field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item').get_text().replace('від ', '')
+        # price_field = item.find('div', class_=CLASS_PRICE_BLOCK).get_text().replace('від ', '')
         tours.append({
-            'title': item.find('div', class_='field field--name-node-title field--type-ds field--label-hidden field--item').get_text(strip=True),
+            'title': item.find('div', class_=CLASS_ITEM).get_text(strip=True),
             'link': HOST + item.find('a', href=True).attrs['href'],
-            # 'price': item.find('div', class_='field field--name-ftf-discount-price-actual field--type-string field--label-hidden field--item').get_text(),
-            'price': price_field,
+            # 'price': item.find('div', class_=CLASS_PRICE_BLOCK).get_text().replace('від ', ''),
+            'price': str(item.find('div', class_=CLASS_PRICE_BLOCK).get_text().replace('від ', '')),
             'country': item.find('span', class_='field-content').get_text()
         })
     return(tours)
@@ -61,5 +65,5 @@ def parse():
         # print(tours)
     else:
         print('Error on page, not 200 response')
-
+    print(tours)
 parse()
