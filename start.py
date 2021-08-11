@@ -20,6 +20,7 @@ response = requests.get(URL)
 soup = bs4.BeautifulSoup(response.text, 'html.parser')
 pages_count = int(re.findall('(?<=page\=)\d+', str(soup.find("li", class_=CLASS_PAGER_ITEM)))[0])
 
+
 def get_html(url, params=None):
     r = requests.get(url, headers=HEADERS, params=params)
     return r
