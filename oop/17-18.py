@@ -1,64 +1,54 @@
-import xlsxwriter
-import openpyxl
+from openpyxl import Workbook, open
 
 xls_file = 'example.xlsx'
 xls_sheet = 'from_my_dict'
 
+
 class ListIteration:
 
     def __init__(self, a):
-        print(a)
+        print("Наш список для итераций: \n", a)
         # print('init')
         self.a = a
         self.my_dict = {}
-        self.workbook = xlsxwriter.Workbook(xls_file)
-        self.worksheet = self.workbook.add_worksheet(xls_sheet)
-        # self.row = 0
-        # self.col = 0
+        self.wb = Workbook()
+        self.ws = self.wb.create_sheet(xls_sheet)
+        self.wb.active = 1
+        # print(self.wb.active)
 
     def unpack_list(self):
+        print("Разворачиваем список:")
         for i in self.a:
             print(i, end=' ')
         print()
 
     def dictate(self):
         # self.my_dict = {}
+        print("Собрали из списка такой dict:")
         for i in self.a:
             self.my_dict[i] = i
         print(self.my_dict)
 
     def write_to_xls(self):
         if self.my_dict:
-            row = 0
-            col = 0
-            print('дикт для распаковки в xls:', self.my_dict)
-            # order = sorted(self.my_dict.keys())
-            # for key in order:
+            # print('дикт для распаковки в xls:', self.my_dict)
             for key in self.my_dict.keys():
-                print(key)
-                self.worksheet.write(row, col, key)
-                self.worksheet.write(row, col, self.my_dict[key])
-
-                row += 1
-
-                # for item in self.my_dict[key]:
-                #     print(item, row, col + 1)
-                #     self.worksheet.write(row, col + 1, item)
-                #     col += 1
-                # col = 0
-            self.workbook.close()
+                self.ws.cell(row=key, column=1).value = self.my_dict[key]
+            self.wb.save(xls_file)
+            self.wb.close()
 
     def from_xls(self):
-        file = open(xls_file)
-        xls_to_dict = file.read()
+        file = open(xls_file, read_only=True)
+        sheet = file.active
+        for row in range(1, sheet.max_row):
+            value = sheet[row][0].value
+            print("В строке", row, "Соджержится значение:", value)
         file.close()
-        print('Дикт из нашего xls:', xls_to_dict)
-
 
 obj_a = ListIteration(a=[1, 2, 3, 12, 8, 4])
 obj_a.unpack_list()
 obj_a.dictate()
 obj_a.write_to_xls()
-# obj_a.from_xls()
+obj_a.from_xls()
 # obj_a.func()
 # obj_a._func()
