@@ -45,6 +45,7 @@ class ListIteration:
             print("В строке", row, "Соджержится значение:", value)
         file.close()
 
+
 obj_a = ListIteration(a=[1, 2, 3, 12, 8, 4])
 obj_a.unpack_list()
 obj_a.dictate()
